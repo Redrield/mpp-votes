@@ -1,0 +1,38 @@
+[package]
+version = "0.1.0"
+name = "mpp-votes"
+repository = "https://github.com/seed-rs/seed-quickstart"
+authors = ["Redrield <redrield@gmail.com>"]
+description = "App Description"
+categories = ["category"]
+license = "MIT"
+readme = "./README.md"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.18"
+
+[dependencies]
+common = { path = "./common" }
+console_log = "0.2.0"
+flate2 = "1.0.19"
+futures-util = "0.3.8"
+js-sys = "0.3.45"
+log = "0.4.11"
+percent-encoding = "2.1.0"
+rand = "0.7.3"
+seed = "0.8.0"
+serde = { version = "1.0.117", features = ["derive"] }
+serde_json = "1.0.59"
+wasm-bindgen = { version = "0.2.68", features = ["serde-serialize"] }
+
+[profile.release]
+lto = true
+opt-level = 'z'
+codegen-units = 1
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-Os']
