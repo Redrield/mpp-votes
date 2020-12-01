@@ -4,5 +4,5 @@ all:
 	mkdir dist/
 	cp index.html dist/
 	cp -r css dist/
-	wasm-pack --target web --out-name package
+	wasm-pack build --target web --out-name package
 	cp -r pkg/ dist/
