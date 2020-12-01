@@ -7,6 +7,7 @@ use std::collections::HashMap;
 use strsim::normalized_damerau_levenshtein;
 
 /// The simple search engine.
+#[derive(Clone)]
 pub struct SimSearch<Id>
     where
         Id: PartialEq + Clone,
@@ -88,6 +89,7 @@ impl<Id> SimSearch<Id>
 
     pub fn search_tokens(&self, pattern_tokens: &[&str]) -> Vec<Id> {
         let mut pattern_tokens = self.tokenize(pattern_tokens);
+        log::info!("Pattern toks {:?}", pattern_tokens);
         pattern_tokens.sort();
         pattern_tokens.dedup();
 
@@ -98,6 +100,7 @@ impl<Id> SimSearch<Id>
                 let score = normalized_damerau_levenshtein(token, &pattern_token);
 
                 if score > self.option.threshold {
+                    log::info!("Score for {} in token_scores", token);
                     token_scores.insert(token, score);
                 }
             }
@@ -114,6 +117,7 @@ impl<Id> SimSearch<Id>
         let mut result_scores: Vec<(usize, f64)> = result_scores.drain().collect();
         result_scores.sort_by(|lhs, rhs| rhs.1.partial_cmp(&lhs.1).unwrap());
 
+        log::info!("Got results {:?}", result_scores);
         let result_ids: Vec<Id> = result_scores
             .iter()
             .map(|(id_num, _)| {
@@ -178,6 +182,7 @@ impl<Id> SimSearch<Id>
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct SearchOptions {
     case_sensitive: bool,
     stop_whitespace: bool,

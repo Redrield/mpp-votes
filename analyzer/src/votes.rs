@@ -48,6 +48,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                 // corner case: enough nays that the table needs to be split
                 next_node_has_votes = false;
                 check = true;
+                seen.push(child);
                 continue;
             }
 
@@ -62,6 +63,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                             n.text().to_lowercase().contains("motion")
                                 || n.text().to_lowercase().contains("moved")
                                 || n.text().to_lowercase().contains("reading")
+                                || n.text().to_lowercase().contains("bill")
                         })
                         .unwrap_or_else(|| {
                             log::error!("{:#?}", seen);
@@ -76,7 +78,9 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                             .take_while(|n| {
                                 !(n.text().to_lowercase().contains("motion")
                                     || n.text().to_lowercase().contains("moved")
-                                    || n.text().to_lowercase().contains("reading"))
+                                    || n.text().to_lowercase().contains("reading")
+                                    || n.text().to_lowercase().contains("bill")
+                                )
                             })
                             .collect::<Vec<Node>>()
                             .into_iter()
@@ -95,6 +99,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
             if check {
                 divisions.push(parser::parse_division(&division, date));
                 division.clear();
+                next_node_has_votes = false;
                 check = false;
             }
 

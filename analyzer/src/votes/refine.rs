@@ -8,6 +8,7 @@ use common::{Member, Division, Party};
 /// This function will iterate over the ayes and nays extracted in the raw division, and match them with the full details for the MPP
 /// The resultant Division will contain an identical topic, with aye and nay fields being Vec<Member> instead of raw Strings.
 pub fn refine_division(division: RawDivision, all_members: &Vec<Member>) -> Division {
+    log::info!("Empty topic dated {} {}", division.date, division.topic.trim().is_empty());
     let pat = Regex::new(r#"\r\n(\r\n)?"#).unwrap();
 
     let mut ayes = vec![];
@@ -42,8 +43,8 @@ fn identify_member(name: &str, members: &Vec<Member>) -> Option<Member> {
         let mut it = name.split_whitespace();
         let name = it.next().unwrap().trim();
         let riding = it
-            .next()
-            .unwrap()
+            .collect::<Vec<&str>>()
+            .join(" ")
             .replace("(", "")
             .replace(")", "")
             .replace("–", "-");

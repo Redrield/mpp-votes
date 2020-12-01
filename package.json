@@ -1,0 +1,23 @@
+{
+  "name": "mpp-votes",
+  "version": "1.0.0",
+  "description": "> Basic Rust-only template for your new Seed app.",
+  "main": "sass/parties.scss",
+  "scripts": {
+      "css-build": "node-sass --omit-source-map-url sass/parties.scss css/bulma.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Redrield/mpp-votes.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Redrield/mpp-votes/issues"
+  },
+  "homepage": "https://github.com/Redrield/mpp-votes#readme",
+  "devDependencies": {
+    "bulma": "^0.9.1",
+    "node-sass": "^5.0.0"
+  }
+}

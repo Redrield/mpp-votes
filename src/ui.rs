@@ -1,5 +1,5 @@
 use common::{Member, Division};
-use crate::Msg;
+use crate::{Msg, Model};
 use seed::prelude::*;
 use seed::*;
 use std::borrow::Cow;
@@ -12,9 +12,16 @@ pub mod vote;
 pub enum Page {
     Home,
     MppList,
-    Mpp(Member),
+    Mpp(String),
     VoteList,
-    Vote(Division),
+    Vote(usize),
+    NotFound,
+}
+
+impl Default for Page {
+    fn default() -> Self {
+        Page::Home
+    }
 }
 
 impl Page {
@@ -26,8 +33,21 @@ impl Page {
     }
 }
 
+impl From<Url> for Page {
+    fn from(mut url: Url) -> Self {
+        match url.remaining_hash_path_parts().as_slice() {
+            &[] => Page::Home,
+            &["members"] => Page::MppList,
+            &["votes"] => Page::VoteList,
+            &["members", riding] => Page::Mpp(riding.to_string()),
+            &["votes", vote_id] => Page::Vote(vote_id.parse().unwrap()),
+            _ => Page::NotFound,
+        }
+    }
+}
+
 pub fn navbar(current_page: &Page) -> Node<Msg> {
-    nav![C!["navbar has-shadow"], attrs!{ At::Custom(Cow::Borrowed("role")) => "navigation", At::AriaLabel => "Main Navigation" },
+    nav![C!["navbar is-fixed-top has-shadow"], attrs!{ At::Custom(Cow::Borrowed("role")) => "navigation", At::AriaLabel => "Main Navigation" },
         div![C!["navbar-menu"], id!["mainNavbar"],
             div![C!["navbar-start"],
                 a![C!["navbar-item", IF!(*current_page == Page::Home => "is-active")], attrs!{ At::Href => "#" }, "Home"],
@@ -38,9 +58,13 @@ pub fn navbar(current_page: &Page) -> Node<Msg> {
     ]
 }
 
-pub fn page(current_page: &Page) -> Node<Msg> {
-    match *current_page {
+pub fn page(model: &Model) -> Node<Msg> {
+    match model.current_page {
         Page::Home => home::content(),
-        _ => todo!()
+        Page::MppList => mpp::members_list(model),
+        Page::Mpp(ref riding) => mpp::member_voting_record(riding, model),
+        Page::Vote(idx) => vote::single_vote_record(idx, model),
+        Page::VoteList => vote::vote_list(model),
+        ref page => todo!("{:?}", page)
     }
 }

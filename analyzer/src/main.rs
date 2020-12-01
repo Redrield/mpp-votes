@@ -78,7 +78,8 @@ async fn main() {
 
     log::info!("Refining collected divisions...");
     let divisions = divisions.into_iter().map(|div| refine_division(div, &members))
-        .sorted_by(|div1, div2| Ord::cmp(&div1.date, &div2.date)).collect::<Vec<Division>>();
+        .filter(|d| !d.topic.is_empty())
+        .sorted_by(|div1, div2| Ord::cmp(&div2.date, &div1.date)).collect::<Vec<Division>>();
     log::info!("Refined.");
 
     // Fairly simple stuff here, get the existing records, unpin them to let them slowly be purged from the network, and replace them with the new data
@@ -93,13 +94,13 @@ async fn main() {
     log::info!("Uploading members...");
     let members_hash = actions::update_members(members, &client).await;
 
-    let compressed_old = util::read_complete(client.cat(&redir.divisions)).await;
+    let compressed_old = String::from_utf8(util::read_complete(client.cat(&redir.divisions)).await).unwrap();
     let _ = client.pin_rm(&format!("/ipfs/{}", redir.divisions), true).await.unwrap();
-    let mut decoder = GzDecoder::new(&compressed_old[..]);
-    let mut old = String::new();
-    decoder.read_to_string(&mut old).unwrap();
+    // let mut decoder = GzDecoder::new(&compressed_old[..]);
+    // let mut old = String::new();
+    // decoder.read_to_string(&mut old).unwrap();
     log::info!("Got old divisions. Updating...");
-    let divisions_hash = actions::update_votes(old, divisions, &client).await;
+    let divisions_hash = actions::update_votes(compressed_old, divisions, &client).await;
 
     log::info!("Updating redirects...");
     redir.members = members_hash;

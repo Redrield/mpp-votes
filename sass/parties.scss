@@ -1,0 +1,17 @@
+@charset "utf-8";
+@use "sass:map";
+
+$opc:#245EAC;
+$opc-invert:findColorInvert($opc);
+$ndp:#F87B00;
+$ndp-invert:findColorInvert($ndp);
+$lib:#EC1F37;
+$lib-invert:findColorInvert($lib);
+$grn:#008632;
+$grn-invert:findColorInvert($grn);
+$ind:#949599;
+$ind-invert:findColorInvert($ind);
+
+$custom-colors:("opc":$opc, "ndp":$ndp, "lib":$lib, "grn":$grn, "ind":$ind);
+
+@import "../node_modules/bulma/bulma.sass";

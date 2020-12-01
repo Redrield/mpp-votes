@@ -1,0 +1,55 @@
+use crate::{Model, Msg};
+use seed::{*, prelude::*};
+use super::mpp::member_card;
+
+pub fn vote_list(model: &Model) -> Node<Msg> {
+    div![C!["container"],
+        section![C!["hero"],
+            div![C!["hero-body"],
+                h1![C!["title has-text-centered is-1"], "Recorded Votes"],
+                div![C!["content has-text-centered is-medium"],
+                    p!["A list of all recorded votes in the current session. Click a vote to see the split."]
+                ]
+            ]
+        ],
+        section![C!["section"],
+            div![C!["tile is-ancestor"],
+                div![C!["tile is-parent is-vertical"],
+                    model.divisions.iter().enumerate().map(|(i, d)| {
+                        div![C!["tile is-child box"],
+                            a![attrs!{ At::Href => &format!("#/votes/{}", i) }, style!{ St::Color => "inherit", St::TextDecoration => "inherit" },
+                                p![&d.topic],
+                                p![&d.date]
+                            ]
+                        ]
+                    })
+                ]
+            ]
+        ]
+    ]
+}
+
+pub fn single_vote_record(idx: usize, model: &Model) -> Node<Msg> {
+    let vote = &model.divisions[idx];
+
+    div![C!["container"],
+        section![C!["section"],
+            div![C!["content has-text-centered"],
+                p![C!["title"], &format!("Vote {}", model.divisions.len() - idx)],
+                p![C!["subtitle"], &vote.topic]
+            ]
+        ],
+        section![C!["section"],
+            div![C!["columns"],
+                div![C!["column"],
+                    p![C!["title"], &format!("Yes ({})", vote.ayes.len())],
+                    vote.ayes.iter().map(|m| member_card(m, "my-6"))
+                ],
+                div![C!["column"],
+                    p![C!["title"], &format!("No ({})", vote.nays.len())],
+                    vote.nays.iter().map(|m| member_card(m, "my-6"))
+                ]
+            ]
+        ]
+    ]
+}

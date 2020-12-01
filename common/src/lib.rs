@@ -56,6 +56,17 @@ impl Party {
             Party::Unknown => "Unknown"
         }
     }
+
+    pub fn favourite_colour(&self) -> &str {
+        match self {
+            Party::OPC => "has-background-opc",
+            Party::NDP => "has-background-ndp",
+            Party::LIB => "has-background-lib",
+            Party::GRN => "has-background-grn",
+            Party::Independent => "has-background-ind",
+            Party::Unknown => "black",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
