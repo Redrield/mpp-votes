@@ -4,7 +4,7 @@ use percent_encoding::{AsciiSet, CONTROLS, utf8_percent_encode};
 use serde::Deserialize;
 use web_sys::RequestMode;
 
-const IPFS_GATEWAY_BASE: &'static str = "https://ipfs.io";
+const IPFS_GATEWAY_BASE: &'static str = "https://gateway.pinata.cloud";
 const RIDING_LOOKUP_BASE: &'static str = "https://afternoon-garden-05476.herokuapp.com/";
 const FRAGMENT: &'static AsciiSet = &CONTROLS.add(b' ');
 

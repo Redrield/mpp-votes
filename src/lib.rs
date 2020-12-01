@@ -43,7 +43,8 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         divisions: vec![],
         current_page: Page::from(url),
         rdy: false,
-        searching: false
+        searching: false,
+        navbar_active: false,
     }
 }
 
@@ -61,6 +62,7 @@ pub struct Model {
     current_page: Page,
     rdy: bool,
     searching: bool,
+    navbar_active: bool,
 }
 
 // ------ ------
@@ -76,11 +78,13 @@ pub enum Msg {
     QueryChanged(String),
     SearchComplete(Vec<Member>),
     Submit,
+    NavbarClick
 }
 
 // `update` describes how to handle each `Msg`.
 fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::NavbarClick => model.navbar_active = !model.navbar_active,
         Msg::Submit => {
             model.searching = true;
             let query = model.query.clone();
@@ -107,6 +111,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             //         model.query = "".to_string();
             //     }
             // }
+            model.navbar_active = false;
             model.current_page = new_page;
         }
         Msg::RedirectsFetched(redir) => {
@@ -153,12 +158,12 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 fn view(model: &Model) -> Vec<Node<Msg>> {
     if model.rdy {
         nodes![
-            ui::navbar(&model.current_page),
-            ui::page(&model),
+            ui::navbar(model),
+            ui::page(model),
         ]
     } else {
         nodes![
-            ui::navbar(&model.current_page),
+            ui::navbar(model),
             div![C!["container"],
                 h2!["Loading..."],
             ]
