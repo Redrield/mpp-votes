@@ -32,18 +32,33 @@ lazy_static! {
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     orders.subscribe(Msg::UrlChanged);
     orders.perform_cmd(async {
-        let data = api::ipfs_get("/ipns/k2k4r8ka63uxofwvctgqzl9xgz7h8c8sekmhdailvgf1pd9px5bogyxe").await;
-        Msg::RedirectsFetched(serde_json::from_str(&data).unwrap())
+        let data = Request::new("/data/members")
+            .method(Method::Get)
+            .fetch().await.unwrap()
+            .json::<Vec<Member>>()
+            .await.unwrap();
+        Msg::MembersFetched(data)
     });
+    orders.perform_cmd(async {
+        let data = Request::new("/data/divisions")
+            .method(Method::Get)
+            .fetch().await.unwrap()
+            .json::<Vec<Division>>()
+            .await.unwrap();
+        Msg::DivisionsFetched(data)
+    });
+
     Model {
         members_search: SimSearch::new_with(SearchOptions::new().case_sensitive(false).threshold(0.6)),
         members: vec![],
         display_members: None,
         query: "".to_string(),
         divisions: vec![],
+        display_divisions: None,
         current_page: Page::from(url),
         rdy: false,
-        searching: false
+        searching: false,
+        navbar_active: false,
     }
 }
 
@@ -58,9 +73,11 @@ pub struct Model {
     display_members: Option<Vec<Member>>,
     query: String,
     divisions: Vec<Division>,
+    display_divisions: Option<Vec<Division>>,
     current_page: Page,
     rdy: bool,
     searching: bool,
+    navbar_active: bool,
 }
 
 // ------ ------
@@ -69,55 +86,68 @@ pub struct Model {
 
 // `Msg` describes the different events you can modify state with.
 pub enum Msg {
-    RedirectsFetched(Redirects),
     MembersFetched(Vec<Member>),
     DivisionsFetched(Vec<Division>),
     UrlChanged(subs::UrlChanged),
     QueryChanged(String),
-    SearchComplete(Vec<Member>),
+    MemberSearchComplete(Vec<Member>),
+    DivisionSearchComplete(Vec<Division>),
     Submit,
+    NavbarClick
 }
 
 // `update` describes how to handle each `Msg`.
 fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::NavbarClick => model.navbar_active = !model.navbar_active,
         Msg::Submit => {
             model.searching = true;
             let query = model.query.clone();
-            let search = model.members_search.clone();
-            orders.perform_cmd(async move {
-                if POSTAL_CODE_RE.is_match(query.trim()) {
-                    use gloo_timers::future::TimeoutFuture;
-                    let _ = TimeoutFuture::new(50).await;
-                    let result = api::lookup_postal_code(query.trim()).await;
-                    Msg::SearchComplete(search.search(&result))
-                } else {
-                    cmds::timeout(50, move || Msg::SearchComplete(search.search(&query))).await
+
+            match model.current_page {
+                Page::MppList => {
+                    let search = model.members_search.clone();
+                    orders.perform_cmd(async move {
+                        if POSTAL_CODE_RE.is_match(query.trim()) {
+                            use gloo_timers::future::TimeoutFuture;
+                            let _ = TimeoutFuture::new(50).await;
+                            let result = api::lookup_postal_code(query.trim()).await;
+                            Msg::MemberSearchComplete(search.search(&result))
+                        } else {
+                            cmds::timeout(50, move || Msg::MemberSearchComplete(search.search(&query))).await
+                        }
+                    });
                 }
-            });
+                Page::VoteList => {
+                    orders.perform_cmd(async move {
+                        use gloo_timers::future::TimeoutFuture;
+                        let _ = TimeoutFuture::new(50).await;
+                        let response = Request::new(&format!("/api/search?query={}", query))
+                            .method(Method::Get)
+                            .fetch()
+                            .await.unwrap()
+                            .json::<Vec<Division>>()
+                            .await.unwrap();
+                        Msg::DivisionSearchComplete(response)
+                    });
+                }
+                _ => unreachable!()
+            }
         },
         Msg::QueryChanged(query) => model.query = query,
         Msg::UrlChanged(subs::UrlChanged(url)) => {
             let new_page = Page::from(url);
             web_sys::window().unwrap().scroll_to_with_x_and_y(0.0, 0.0);
-            // match (&model.current_page, &new_page) {
-            //     (&Page::MppList, &Page::Mpp(_)) | (&Page::Mpp(_), &Page::MppList) => {}
-            //     _ => {
-            //         model.display_members = None;
-            //         model.query = "".to_string();
-            //     }
-            // }
+            match (&model.current_page, &new_page) {
+                (&Page::MppList, &Page::Mpp(_)) | (&Page::Mpp(_), &Page::MppList) => {},
+                (&Page::VoteList, &Page::Vote(_)) | (&Page::Vote(_), &Page::VoteList) => {},
+                _ => {
+                    model.display_members = None;
+                    model.query = "".to_string();
+                }
+            }
+            model.navbar_active = false;
             model.current_page = new_page;
-        }
-        Msg::RedirectsFetched(redir) => {
-            log::info!("Redirects fetched, getting resources.");
-            let Redirects { members, divisions } = redir;
-            orders.perform_cmd(async move {
-                Msg::MembersFetched(serde_json::from_str(&api::ipfs_get(&format!("/ipfs/{}", members)).await).unwrap())
-            });
-            orders.perform_cmd(async move {
-                Msg::DivisionsFetched(serde_json::from_str(&api::ipfs_get(&format!("/ipfs/{}", divisions)).await).unwrap())
-            });
         }
         Msg::MembersFetched(members) => {
             model.members = members;
@@ -131,14 +161,21 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::DivisionsFetched(divisions) => {
             model.divisions = divisions;
             model.rdy = true;
-            //TODO: Index
         }
-        Msg::SearchComplete(result) => {
+        Msg::MemberSearchComplete(result) => {
             log::info!("{:?}", result);
             if result.is_empty() {
                 model.display_members = None;
             } else {
                 model.display_members = Some(result);
+            }
+            model.searching = false;
+        }
+        Msg::DivisionSearchComplete(result) => {
+            if result.is_empty() {
+                model.display_divisions = None;
+            } else {
+                model.display_divisions = Some(result);
             }
             model.searching = false;
         }
@@ -153,12 +190,12 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 fn view(model: &Model) -> Vec<Node<Msg>> {
     if model.rdy {
         nodes![
-            ui::navbar(&model.current_page),
-            ui::page(&model),
+            ui::navbar(model),
+            ui::page(model),
         ]
     } else {
         nodes![
-            ui::navbar(&model.current_page),
+            ui::navbar(model),
             div![C!["container"],
                 h2!["Loading..."],
             ]

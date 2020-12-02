@@ -5,7 +5,7 @@ use common::{Party, Member};
 pub fn member_card(member: &Member, margin: impl ToClasses) -> Node<Msg> {
     div![C!["card", margin], style!{ St::MinWidth => "14rem", St::MinHeight=> "10rem" },
         header![C!["card-header", member.party.favourite_colour()],
-            a![C!["card-header-title"], attrs!{ At::Href => &format!("#/members/{}", member.riding) }, &member.full_name]
+            a![C!["has-text-white card-header-title"], attrs!{ At::Href => &format!("#/members/{}", member.riding) }, &member.full_name]
         ],
         div![C!["card-content"],
             div![C!["content is-small"],
@@ -39,10 +39,12 @@ pub fn members_list(model: &Model) -> Node<Msg> {
                         ]
                     ]
                 ],
-                div![C!["level is-flex is-flex-direction-row"], style! { St::OverflowX => "scroll" },
-                    model.display_members.as_ref().unwrap_or(&model.members)
-                        .iter().map(|m| member_card(m, "mx-3"))
-                ]
+            ]
+        ],
+        section![C!["section"],
+            div![C!["level is-flex is-flex-direction-row"], style! { St::OverflowX => "scroll" },
+                model.display_members.as_ref().unwrap_or(&model.members)
+                    .iter().map(|m| member_card(m, "mx-3"))
             ]
         ]
     ]

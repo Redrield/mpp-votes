@@ -82,36 +82,42 @@ async fn main() {
         .sorted_by(|div1, div2| Ord::cmp(&div2.date, &div1.date)).collect::<Vec<Division>>();
     log::info!("Refined.");
 
-    // Fairly simple stuff here, get the existing records, unpin them to let them slowly be purged from the network, and replace them with the new data
-    let client = IpfsClient::default();
-    log::info!("Resolving old file...");
-    let res = client.name_resolve(Some("/ipns/k2k4r8ka63uxofwvctgqzl9xgz7h8c8sekmhdailvgf1pd9px5bogyxe"), false, false).await.unwrap();
-    log::info!("Resolved path {}", res.path);
-    let redir = String::from_utf8(util::read_complete(client.cat(&res.path)).await).unwrap();
-    let _ = client.pin_rm(&res.path, true).await.unwrap();
-    let mut redir = serde_json::from_str::<Redirects>(&redir).unwrap();
+    log::info!("Outputting files..");
+    std::fs::write("members.json", serde_json::to_string(&members).unwrap());
+    std::fs::write("divisions.json", serde_json::to_string(&divisions).unwrap());
+    log::info!("Done.");
 
-    log::info!("Uploading members...");
-    let members_hash = actions::update_members(members, &client).await;
 
-    let compressed_old = String::from_utf8(util::read_complete(client.cat(&redir.divisions)).await).unwrap();
-    let _ = client.pin_rm(&format!("/ipfs/{}", redir.divisions), true).await.unwrap();
-    // let mut decoder = GzDecoder::new(&compressed_old[..]);
-    // let mut old = String::new();
-    // decoder.read_to_string(&mut old).unwrap();
-    log::info!("Got old divisions. Updating...");
-    let divisions_hash = actions::update_votes(compressed_old, divisions, &client).await;
-
-    log::info!("Updating redirects...");
-    redir.members = members_hash;
-    redir.divisions = divisions_hash;
-    let json = serde_json::to_string(&redir).unwrap();
-    let res = client.add(Cursor::new(json)).await.unwrap();
-    let hash = res.hash;
-
-    // Update the IPNS record of the node hosting this data. The website queries the gateway with IPNS to find the up to date data
-    log::info!("Updating IPNS");
-    let res = client.name_publish(&format!("/ipfs/{}", hash), false, Some("25h"), None, None).await;
-    log::info!("Final result: {}", res.is_ok());
-    log::info!("Done.")
+//    // Fairly simple stuff here, get the existing records, unpin them to let them slowly be purged from the network, and replace them with the new data
+//    let client = IpfsClient::default();
+//    log::info!("Resolving old file...");
+//    let res = client.name_resolve(Some("/ipns/k2k4r8ka63uxofwvctgqzl9xgz7h8c8sekmhdailvgf1pd9px5bogyxe"), false, false).await.unwrap();
+//    log::info!("Resolved path {}", res.path);
+//    let redir = String::from_utf8(util::read_complete(client.cat(&res.path)).await).unwrap();
+//    let _ = client.pin_rm(&res.path, true).await.unwrap();
+//    let mut redir = serde_json::from_str::<Redirects>(&redir).unwrap();
+//
+//    log::info!("Uploading members...");
+//    let members_hash = actions::update_members(members, &client).await;
+//
+//    let compressed_old = String::from_utf8(util::read_complete(client.cat(&redir.divisions)).await).unwrap();
+//    let _ = client.pin_rm(&format!("/ipfs/{}", redir.divisions), true).await.unwrap();
+//    // let mut decoder = GzDecoder::new(&compressed_old[..]);
+//    // let mut old = String::new();
+//    // decoder.read_to_string(&mut old).unwrap();
+//    log::info!("Got old divisions. Updating...");
+//    let divisions_hash = actions::update_votes(compressed_old, divisions, &client).await;
+//
+//    log::info!("Updating redirects...");
+//    redir.members = members_hash;
+//    redir.divisions = divisions_hash;
+//    let json = serde_json::to_string(&redir).unwrap();
+//    let res = client.add(Cursor::new(json)).await.unwrap();
+//    let hash = res.hash;
+//
+//    // Update the IPNS record of the node hosting this data. The website queries the gateway with IPNS to find the up to date data
+//    log::info!("Updating IPNS");
+//    let res = client.name_publish(&format!("/ipfs/{}", hash), false, Some("25h"), None, None).await;
+//    log::info!("Final result: {}", res.is_ok());
+//    log::info!("Done.")
 }

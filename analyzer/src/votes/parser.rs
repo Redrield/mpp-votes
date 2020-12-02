@@ -28,6 +28,11 @@ pub fn parse_division(division: &Vec<Node>, date: &str) -> RawDivision {
         match state {
             ParserState::CollectingTopic => {
                 let lower = node.text().to_lowercase();
+                // Just in case, but at the top this time
+                if node.text().contains("AYES") {
+                    state = ParserState::CollectingAyes;
+                    continue;
+                }
                 if !lower.contains("debate") && (!lower.contains("the following division") || (lower.contains("the following division") && topic.is_empty())) {
                     topic.push_str(&node.text());
                 } else {
