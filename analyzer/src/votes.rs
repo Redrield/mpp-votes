@@ -42,6 +42,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
 
     for main_table in page.find(Class("drum-table")) {
         for child in main_table.first_child().unwrap().children() {
+            // log::info!("DATE {}, TEXT {}", date, child.text());
             if next_node_has_votes {
                 // `child` now contains the nays
                 division.push(child);
@@ -54,6 +55,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
 
             // This is the last part of the tally that is consistent.
             if child.text().contains("NAYS") {
+                let unanimous = child.text().split_whitespace().any(|s| s == "0");
                 // Only add this stuff if its the first occurence of NAY, in the case of a broken table this might be the second time
                 if division.is_empty() {
                     // The topic being voted upon
@@ -88,8 +90,10 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                     );
                     division.push(child);
                 }
-                next_node_has_votes = true;
-                check = false;
+                if !unanimous {
+                    next_node_has_votes = true;
+                }
+                check = unanimous;
                 // This header
                 seen.push(child);
                 continue;
