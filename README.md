@@ -7,7 +7,7 @@
 
 All proceedings in Ontario's Parliament are recorded and published in a document called Hansard, including votes. ONVotes serves to index and organize the votes published by the parliament, to make this vital democratic information more readily available to constituents.
 
-## Parts on ONVotes
+## Parts of ONVotes
 
 This repository is broadly split into 4 parts
 
