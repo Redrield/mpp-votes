@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use select::document::Document;
 use select::node::Node;
 use select::predicate::Class;
@@ -71,7 +70,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                             log::error!("{:#?}", seen);
                             panic!()
                         });
-                    division.push(movement.clone());
+                   division.push(movement.clone());
                     // Everything between now and then (i.e. the AYE votes)
                     division.extend(
                         seen.iter()

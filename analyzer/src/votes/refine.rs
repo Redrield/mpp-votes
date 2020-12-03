@@ -1,8 +1,5 @@
-use crate::votes::RawDivision;
 use regex::Regex;
-use serde::{Serialize, Deserialize};
-use itertools::Itertools;
-use common::{Member, Division, Party};
+use common::{Member, Division};
 
 /// A function to turn the extracted data around a vote into a more computer workable format
 /// This function will iterate over the ayes and nays extracted in the raw division, and match them with the full details for the MPP

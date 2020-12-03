@@ -1,24 +1,15 @@
 use crate::votes::{refine_division, RawDivision};
-use common::{Division, Redirects};
-use chrono::{Local, Utc, NaiveDate, Date, FixedOffset, Duration, Datelike, Weekday};
+use common::Division;
+use chrono::{Local, NaiveDate, Datelike, Weekday};
 use fern::colors::{Color, ColoredLevelConfig};
-use ipfs_api::IpfsClient;
 use log::LevelFilter;
-use regex::Regex;
 use std::io;
-use futures_util::stream::StreamExt;
-use std::io::{Cursor, Write, Read};
-use flate2::read::GzDecoder;
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use rayon::prelude::*;
 use itertools::Itertools;
 
 mod members;
 mod sites;
 mod votes;
-mod actions;
-mod util;
 
 fn init_logger() {
     let colors = ColoredLevelConfig::new()
@@ -45,9 +36,10 @@ fn init_logger() {
 #[tokio::main]
 async fn main() {
     init_logger();
+    let token = std::env::var("API_TOKEN").expect("Need token to update server");
     let start_day = std::env::args().nth(1).expect("Start day to analyze required");
     let start = NaiveDate::parse_from_str(&start_day, "%Y-%m-%d").unwrap();
-    let today = Utc::today().naive_utc();
+    let today = Local::today().naive_local();
 
     log::info!("Parsing members page...");
     let members = members::parse_members().await.unwrap();
@@ -82,9 +74,18 @@ async fn main() {
         .sorted_by(|div1, div2| Ord::cmp(&div2.date, &div1.date)).collect::<Vec<Division>>();
     log::info!("Refined.");
 
-    log::info!("Outputting files..");
-    std::fs::write("members.json", serde_json::to_string(&members).unwrap());
-    std::fs::write("divisions.json", serde_json::to_string(&divisions).unwrap());
+    log::info!("Updating server..");
+    let client = reqwest::Client::default();
+    client.post("https://onvotes.ca/api/write/members")
+        .body(serde_json::to_string(&members).unwrap())
+        .bearer_auth(&token)
+        .send()
+        .await.unwrap();
+    client.post("https://onvotes.ca/api/write/divisions")
+        .body(serde_json::to_string(&divisions).unwrap())
+        .bearer_auth(&token)
+        .send()
+        .await.unwrap();
     log::info!("Done.");
 
 

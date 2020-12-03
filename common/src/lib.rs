@@ -3,12 +3,6 @@ use std::fmt;
 
 pub mod search;
 
-#[derive(Serialize, Deserialize)]
-pub struct Redirects {
-    pub members: String,
-    pub divisions: String
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Party {
     OPC,

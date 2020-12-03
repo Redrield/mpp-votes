@@ -1,4 +1,3 @@
-use common::{Member, Division};
 use crate::{Msg, Model};
 use seed::prelude::*;
 use seed::*;
@@ -7,6 +6,9 @@ use std::borrow::Cow;
 pub mod home;
 pub mod mpp;
 pub mod vote;
+pub mod faqs;
+pub mod footer;
+pub mod error;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Page {
@@ -15,21 +17,13 @@ pub enum Page {
     Mpp(String),
     VoteList,
     Vote(usize),
+    Faqs,
     NotFound,
 }
 
 impl Default for Page {
     fn default() -> Self {
         Page::Home
-    }
-}
-
-impl Page {
-    pub fn on_navbar(&self) -> bool {
-        match self {
-            Page::Home | Page::MppList | Page::VoteList => true,
-            _ => false
-        }
     }
 }
 
@@ -41,6 +35,7 @@ impl From<Url> for Page {
             &["votes"] => Page::VoteList,
             &["members", riding] => Page::Mpp(riding.to_string()),
             &["votes", vote_id] => Page::Vote(vote_id.parse().unwrap()),
+            &["faq"] => Page::Faqs,
             _ => Page::NotFound,
         }
     }
@@ -64,7 +59,8 @@ pub fn navbar(model: &Model) -> Node<Msg> {
             div![C!["navbar-start"],
                 a![C!["navbar-item", IF!(*current_page == Page::Home => "is-active")], attrs!{ At::Href => "#" }, "Home"],
                 a![C!["navbar-item", IF!(*current_page == Page::MppList => "is-active")], attrs!{ At::Href => "#/members" }, "MPPs"],
-                a![C!["navbar-item", IF!(*current_page == Page::VoteList => "is-active")], attrs!{ At::Href => "#/votes" }, "Votes"]
+                a![C!["navbar-item", IF!(*current_page == Page::VoteList => "is-active")], attrs!{ At::Href => "#/votes" }, "Votes"],
+                a![C!["navbar-item", IF!(*current_page == Page::Faqs => "is-active")], attrs!{ At::Href => "#/faq" }, "FAQs"]
             ],
             div![C!["navbar-end"],
                 p![C!["navbar-item"], &format!("Latest Hansard: {}", latest_hansard)]
@@ -80,6 +76,7 @@ pub fn page(model: &Model) -> Node<Msg> {
         Page::Mpp(ref riding) => mpp::member_voting_record(riding, model),
         Page::Vote(idx) => vote::single_vote_record(idx, model),
         Page::VoteList => vote::vote_list(model),
-        ref page => todo!("{:?}", page)
+        Page::Faqs => faqs::content(),
+        _ => error::error_404(),
     }
 }

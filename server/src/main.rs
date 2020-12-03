@@ -1,9 +1,7 @@
-use actix_files as fs;
-use actix_web::{HttpRequest, HttpResponse, Result, HttpServer, App, web, get, middleware};
-use actix_web::http::StatusCode;
+use actix_web::{HttpRequest, Result, HttpServer, App, web, get, middleware};
 use std::path::{PathBuf, Path};
 use actix_files::NamedFile;
-use common::Member;
+use actix_web_httpauth::middleware::HttpAuthentication;
 
 mod db;
 mod json;
@@ -23,14 +21,12 @@ async fn index() -> Result<NamedFile> {
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=debug,actix_server=info");
     env_logger::init();
-    let port = std::env::var("PORT").unwrap_or("8000".to_string());
-    let port_ssl = std::env::var("PORT_SSL").unwrap_or("8443".to_string());
 
     let divisions_path = Path::new("./data/divisions.json");
 
-
-    let res = HttpServer::new(move || {
+    HttpServer::new(move || {
         let (schema, division_index) = db::init(divisions_path);
+        let auth = HttpAuthentication::bearer(api::validator);
 
         App::new()
             .wrap(middleware::Logger::default())
@@ -40,12 +36,15 @@ async fn main() -> std::io::Result<()> {
             .service(json::members)
             .service(json::divisions)
             .service(api::search)
+            .service(api::lookup_postal_code)
+            .service(web::scope("/api/write")
+                .wrap(auth)
+                .route("/members", web::post().to(api::set_members))
+                .route("/divisions", web::post().to(api::add_divisions))
+            )
             .route("/{filename:.*}", web::get().to(assets))
     })
-        .bind(&format!("0.0.0.0:{}", port))?
+        .bind("127.0.0.1:8080")?
         .run()
-        .await;
-
-    log::info!("I can deinit here");
-    res
+        .await
 }

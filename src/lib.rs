@@ -4,20 +4,14 @@
 #![allow(clippy::wildcard_imports)]
 
 use seed::{prelude::*, *};
-use common::{Member, Division, Redirects};
+use common::{Member, Division};
 use common::search::{SimSearch, SearchOptions};
 use log::Level;
-use std::sync::Mutex;
-use std::borrow::Cow;
 use crate::ui::Page;
 use lazy_static::lazy_static;
 use regex::Regex;
 
-mod startup;
-mod util;
 mod api;
-mod searcher;
-// mod bg;
 mod ui;
 
 lazy_static! {
@@ -187,18 +181,20 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 // ------ ------
 
 // `view` describes what to display.
-fn view(model: &Model) -> Vec<Node<Msg>> {
+fn view(model: &Model) -> Node<Msg> {
     if model.rdy {
-        nodes![
+        div![C![IF!(model.current_page == Page::Home => "root")],
             ui::navbar(model),
             ui::page(model),
+            ui::footer::content(),
         ]
     } else {
-        nodes![
+        div![C!["root"],
             ui::navbar(model),
             div![C!["container"],
                 h2!["Loading..."],
-            ]
+            ],
+            ui::footer::content(),
         ]
     }
 }
@@ -210,8 +206,7 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
 // (This function is invoked by `init` function in `index.html`.)
 #[wasm_bindgen(start)]
 pub fn start() {
-    console_log::init_with_level(Level::Info);
-    console_error_panic_hook::set_once();
+    console_log::init_with_level(Level::Info).unwrap();
     log::info!("Starting app...");
     // Mount the `app` to the element with the `id` "app".
     App::start("app", init, update, view);

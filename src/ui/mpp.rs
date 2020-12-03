@@ -1,6 +1,6 @@
 use seed::{*, prelude::*};
 use crate::{Model, Msg};
-use common::{Party, Member};
+use common::Member;
 
 pub fn member_card(member: &Member, margin: impl ToClasses) -> Node<Msg> {
     div![C!["card", margin], style!{ St::MinWidth => "14rem", St::MinHeight=> "10rem" },

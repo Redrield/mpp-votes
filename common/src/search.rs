@@ -1,7 +1,6 @@
 // Code taken from simsearch-rs (https://github.com/andylokandy/simsearch-rs)
 
 use std::f64;
-use std::cmp::max;
 use std::collections::HashMap;
 
 use strsim::normalized_damerau_levenshtein;
@@ -188,7 +187,6 @@ pub struct SearchOptions {
     stop_whitespace: bool,
     stop_words: &'static [&'static str],
     threshold: f64,
-    levenshtein: bool,
 }
 
 impl SearchOptions {
@@ -199,7 +197,6 @@ impl SearchOptions {
             stop_whitespace: true,
             stop_words: &[],
             threshold: 0.8,
-            levenshtein: false,
         }
     }
 
@@ -240,18 +237,5 @@ impl SearchOptions {
     pub fn threshold(self, threshold: f64) -> Self {
         SearchOptions { threshold, ..self }
     }
-
-    /// Sets whether Levenshtein distance, which is SIMD-accelerated, should be
-    /// used instead of the default Jaro-Winkler distance.
-    ///
-    /// The implementation of Levenshtein distance is very fast but cannot handle Unicode
-    /// strings, unlike the default Jaro-Winkler distance. The strings are treated as byte
-    /// slices with Levenshtein distance, which means that the calculated score may be
-    /// incorrectly lower for Unicode strings, where each character is represented with
-    /// multiple bytes.
-    ///
-    /// Defaults to `false`.
-    pub fn levenshtein(self, levenshtein: bool) -> Self {
-        SearchOptions { levenshtein, ..self }
-    }
 }
+

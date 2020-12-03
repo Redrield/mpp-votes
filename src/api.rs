@@ -1,20 +1,11 @@
+#![allow(unused)]
 use seed::browser::fetch::{Request, Header};
 use seed::fetch::Method;
 use percent_encoding::{AsciiSet, CONTROLS, utf8_percent_encode};
 use serde::Deserialize;
 use web_sys::RequestMode;
 
-const IPFS_GATEWAY_BASE: &'static str = "https://gateway.pinata.cloud";
-const RIDING_LOOKUP_BASE: &'static str = "https://afternoon-garden-05476.herokuapp.com/";
 const FRAGMENT: &'static AsciiSet = &CONTROLS.add(b' ');
-
-pub async fn ipfs_get(path: &str) -> String {
-    Request::new(format!("{}{}", IPFS_GATEWAY_BASE, path))
-        .method(Method::Get)
-        .fetch()
-        .await.unwrap()
-        .text().await.unwrap()
-}
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -37,7 +28,7 @@ pub struct ElectoralDistrict {
 }
 
 pub async fn lookup_postal_code(code: &str) -> String {
-    let mut results = Request::new(format!("{}{}", RIDING_LOOKUP_BASE, utf8_percent_encode(code, FRAGMENT)))
+    let mut results = Request::new(format!("/api/postal_code?query={}", utf8_percent_encode(code, FRAGMENT)))
         .method(Method::Get)
         .fetch()
         .await.unwrap()

@@ -1,11 +1,7 @@
 use crate::sites;
 use select::document::Document;
 use select::predicate::{Class, Name};
-use std::collections::HashMap;
 use std::iter::Iterator;
-use std::fmt;
-use std::fmt::Write;
-use serde::{Serialize, Deserialize};
 use common::{Member, Party};
 
 /// Members page displays name as <last>, [Hon.] <first>, turn that into <first> <last> for display by the website.
