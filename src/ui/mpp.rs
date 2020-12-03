@@ -16,6 +16,7 @@ pub fn member_card(member: &Member, margin: impl ToClasses) -> Node<Msg> {
 }
 
 pub fn members_list(model: &Model) -> Node<Msg> {
+    let cls = if model.displaying_search_error { "show" } else { "hide" };
     div![C!["container"],
         section![C!["hero"],
             div![C!["hero-body"],
@@ -31,14 +32,17 @@ pub fn members_list(model: &Model) -> Node<Msg> {
                                     At::Type => "text",
                                     At::Placeholder => "Find your MPP",
                                     At::Value => &model.query
-                                }, input_ev(Ev::Input, Msg::QueryChanged)]
+                                }, input_ev(Ev::Input, Msg::QueryChanged), input_ev(Ev::Change, |_| Msg::Submit)]
                             ],
                             div![C!["control"],
                                 button![C!["button", IF!(model.searching => "is-loading")], input_ev(Ev::Click, |_| Msg::Submit), "Search"]
                             ]
                         ]
-                    ]
+                    ],
                 ],
+                article![C!["message", cls],
+                    div![C!["message-body"], "Couldn't find anything matching that query."]
+                ]
             ]
         ],
         section![C!["section"],

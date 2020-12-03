@@ -53,6 +53,7 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         rdy: false,
         searching: false,
         navbar_active: false,
+        displaying_search_error: false,
     }
 }
 
@@ -72,6 +73,7 @@ pub struct Model {
     rdy: bool,
     searching: bool,
     navbar_active: bool,
+    displaying_search_error: bool,
 }
 
 // ------ ------
@@ -86,6 +88,7 @@ pub enum Msg {
     QueryChanged(String),
     MemberSearchComplete(Vec<Member>),
     DivisionSearchComplete(Vec<Division>),
+    DismissError,
     Submit,
     NavbarClick
 }
@@ -101,12 +104,13 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             match model.current_page {
                 Page::MppList => {
                     let search = model.members_search.clone();
+                    let members = model.members.clone();
                     orders.perform_cmd(async move {
                         if POSTAL_CODE_RE.is_match(query.trim()) {
                             use gloo_timers::future::TimeoutFuture;
                             let _ = TimeoutFuture::new(50).await;
                             let result = api::lookup_postal_code(query.trim()).await;
-                            Msg::MemberSearchComplete(search.search(&result))
+                            Msg::MemberSearchComplete(members.into_iter().filter(|m| m.riding == result).collect())
                         } else {
                             cmds::timeout(50, move || Msg::MemberSearchComplete(search.search(&query))).await
                         }
@@ -159,6 +163,10 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::MemberSearchComplete(result) => {
             log::info!("{:?}", result);
             if result.is_empty() {
+                if !model.query.is_empty() {
+                    model.displaying_search_error = true;
+                    orders.perform_cmd(cmds::timeout(1500, || Msg::DismissError));
+                }
                 model.display_members = None;
             } else {
                 model.display_members = Some(result);
@@ -167,12 +175,17 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         }
         Msg::DivisionSearchComplete(result) => {
             if result.is_empty() {
+                if !model.query.is_empty() {
+                    model.displaying_search_error = true;
+                    orders.perform_cmd(cmds::timeout(1500, || Msg::DismissError));
+                }
                 model.display_divisions = None;
             } else {
                 model.display_divisions = Some(result);
             }
             model.searching = false;
         }
+        Msg::DismissError => model.displaying_search_error = false,
     }
 }
 

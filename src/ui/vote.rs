@@ -3,6 +3,7 @@ use seed::{*, prelude::*};
 use super::mpp::member_card;
 
 pub fn vote_list(model: &Model) -> Node<Msg> {
+    let cls = if model.displaying_search_error { "show" } else { "hide" };
     div![C!["container"],
         section![C!["hero"],
             div![C!["hero-body"],
@@ -18,7 +19,7 @@ pub fn vote_list(model: &Model) -> Node<Msg> {
                                     At::Type => "text",
                                     At::Placeholder => "Find a specific bill",
                                     At::Value => &model.query
-                                }, input_ev(Ev::Input, Msg::QueryChanged)]
+                                }, input_ev(Ev::Input, Msg::QueryChanged), input_ev(Ev::Change, |_| Msg::Submit)]
                             ],
                             div![C!["control"],
                                 button![C!["button", IF!(model.searching => "is-loading")], input_ev(Ev::Click, |_| Msg::Submit), "Search"]
@@ -26,6 +27,9 @@ pub fn vote_list(model: &Model) -> Node<Msg> {
                         ]
                     ]
                 ],
+                article![C!["message", cls],
+                    div![C!["message-body"], "Couldn't find anything matching that query."]
+                ]
             ]
         ],
         section![C!["section"],

@@ -12,6 +12,18 @@
             grid-template-rows: auto 0.5fr;
             min-height: 100vh;
         }
+        .message.hide {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            transition: visibility 0.5s linear, opacity 0.5s linear, position 0.5s linear;
+        }
+        .message.show {
+            visibility: visible;
+            position: static;
+            opacity: 1;
+            transition: opacity 0.5s linear;
+        }
     </style>
 </head>
 
