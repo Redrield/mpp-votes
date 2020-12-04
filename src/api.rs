@@ -36,5 +36,5 @@ pub async fn lookup_postal_code(code: &str) -> String {
         .await.unwrap();
     let first_result = results.first().unwrap();
     let district = first_result.electoral_districts.first().unwrap();
-    district.name.clone()
+    district.name.clone().replace("—", "-").replace("—", "-")
 }

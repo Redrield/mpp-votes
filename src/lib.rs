@@ -15,7 +15,7 @@ mod api;
 mod ui;
 
 lazy_static! {
-    static ref POSTAL_CODE_RE: Regex = Regex::new(r#"[a-zA-Z][0-9][a-zA-Z]\s[0-9][a-zA-Z][0-9]"#).unwrap();
+    static ref POSTAL_CODE_RE: Regex = Regex::new(r#"[a-zA-Z][0-9][a-zA-Z]\s?[0-9][a-zA-Z][0-9]"#).unwrap();
 }
 
 // ------ ------
