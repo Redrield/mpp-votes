@@ -74,18 +74,21 @@ async fn main() {
         .sorted_by(|div1, div2| Ord::cmp(&div2.date, &div1.date)).collect::<Vec<Division>>();
     log::info!("Refined.");
 
-    log::info!("Updating server..");
-    let client = reqwest::Client::default();
-    client.post("https://onvotes.ca/api/write/members")
-        .body(serde_json::to_string(&members).unwrap())
-        .bearer_auth(&token)
-        .send()
-        .await.unwrap();
-    client.post("https://onvotes.ca/api/write/divisions")
-        .body(serde_json::to_string(&divisions).unwrap())
-        .bearer_auth(&token)
-        .send()
-        .await.unwrap();
+    // For weekends
+    if !members.is_empty() && !divisions.is_empty() {
+        log::info!("Updating server...");
+        let client = reqwest::Client::default();
+        client.post("https://onvotes.ca/api/write/members")
+            .json(&members)
+            .bearer_auth(&token)
+            .send()
+            .await.unwrap();
+        client.post("https://onvotes.ca/api/write/divisions")
+            .json(&divisions)
+            .bearer_auth(&token)
+            .send()
+            .await.unwrap();
+    }
     log::info!("Done.");
 
 

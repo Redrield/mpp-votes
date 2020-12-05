@@ -63,6 +63,7 @@ pub async fn add_divisions(data: web::Json<Vec<Division>>, schema: web::Data<Sch
     {
         let mut divs = serde_json::from_reader::<File, Vec<Division>>(File::open("data/divisions.json").unwrap()).unwrap();
         divs.extend_from_slice(&data.0[..]);
+        divs.sort_by(|a, b| Ord::cmp(&b.date, &a.date));
         std::fs::write("data/divisions.json", serde_json::to_string(&divs).unwrap()).unwrap();
     }
 
