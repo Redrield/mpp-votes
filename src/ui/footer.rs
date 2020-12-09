@@ -6,7 +6,9 @@ pub fn content() -> Node<Msg> {
         div![C!["level"],
             div![C!["level-left"],
                 div![C!["level-item"],
-                    p!["ONVotes by Kaitlyn Kenwell"]
+                    p!["ONVotes by Kaitlyn Kenwell", br![], "Content extracted from the ",
+                        a![attrs!{ At::Href => "https://ola.org" }, "Ontario Legislative Assembly"]
+                    ],
                 ],
             ],
             div![C!["level-right"],

@@ -16,9 +16,9 @@ pub enum Page {
     MppList,
     Mpp(String),
     VoteList,
-    Vote(usize),
+    Vote(String),
     Faqs,
-    NotFound,
+    NotFound(bool),
 }
 
 impl Default for Page {
@@ -34,9 +34,15 @@ impl From<Url> for Page {
             &["members"] => Page::MppList,
             &["votes"] => Page::VoteList,
             &["members", riding] => Page::Mpp(riding.to_string()),
-            &["votes", vote_id] => Page::Vote(vote_id.parse().unwrap()),
+            &["votes", vote_id] => {
+                if let Ok(_) = vote_id.parse::<usize>() {
+                    Page::NotFound(true)
+                } else {
+                    Page::Vote(vote_id.to_string())
+                }
+            }
             &["faq"] => Page::Faqs,
-            _ => Page::NotFound,
+            _ => Page::NotFound(false),
         }
     }
 }
@@ -70,13 +76,13 @@ pub fn navbar(model: &Model) -> Node<Msg> {
 }
 
 pub fn page(model: &Model) -> Node<Msg> {
-    match model.current_page {
+    match &model.current_page {
         Page::Home => home::content(),
         Page::MppList => mpp::members_list(model),
-        Page::Mpp(ref riding) => mpp::member_voting_record(riding, model),
+        Page::Mpp(riding) => mpp::member_voting_record(riding, model),
         Page::Vote(idx) => vote::single_vote_record(idx, model),
         Page::VoteList => vote::vote_list(model),
         Page::Faqs => faqs::content(),
-        _ => error::error_404(),
+        Page::NotFound(from_vote) => error::error_404(*from_vote),
     }
 }

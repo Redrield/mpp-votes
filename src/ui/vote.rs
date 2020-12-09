@@ -1,6 +1,12 @@
 use crate::{Model, Msg};
 use seed::{*, prelude::*};
 use super::mpp::member_card;
+use sha::sha1::Sha1;
+use sha::utils::{Digest, DigestExt};
+
+fn topic_hash(topic: &str) -> String {
+    Sha1::default().digest(topic.as_bytes()).to_hex()
+}
 
 pub fn vote_list(model: &Model) -> Node<Msg> {
     let cls = if model.displaying_search_error { "show" } else { "hide" };
@@ -36,9 +42,9 @@ pub fn vote_list(model: &Model) -> Node<Msg> {
             div![C!["tile is-ancestor"],
                 div![C!["tile is-parent is-vertical"],
                     model.display_divisions.as_ref().unwrap_or(&model.divisions).iter().map(|d| {
-                        let i = model.divisions.iter().enumerate().find(|(_, d0)| d == *d0).unwrap().0;
+                        let digest = topic_hash(&d.topic);
                         div![C!["tile is-child box"],
-                            a![attrs!{ At::Href => &format!("#/votes/{}", i) }, style!{ St::Color => "inherit", St::TextDecoration => "inherit" },
+                            a![attrs!{ At::Href => &format!("#/votes/{}", digest) }, style!{ St::Color => "inherit", St::TextDecoration => "inherit" },
                                 p![&d.topic],
                                 p![&d.date]
                             ]
@@ -50,27 +56,30 @@ pub fn vote_list(model: &Model) -> Node<Msg> {
     ]
 }
 
-pub fn single_vote_record(idx: usize, model: &Model) -> Node<Msg> {
-    let vote = &model.divisions[idx];
-
-    div![C!["container"],
-        section![C!["section"],
-            div![C!["content has-text-centered"],
-                p![C!["title"], &format!("Vote {}", model.divisions.len() - idx)],
-                p![C!["subtitle"], &vote.topic]
-            ]
-        ],
-        section![C!["section"],
-            div![C!["columns"],
-                div![C!["column"],
-                    p![C!["title"], &format!("Yes ({})", vote.ayes.len())],
-                    vote.ayes.iter().map(|m| member_card(m, "my-6"))
-                ],
-                div![C!["column"],
-                    p![C!["title"], &format!("No ({})", vote.nays.len())],
-                    vote.nays.iter().map(|m| member_card(m, "my-6"))
+pub fn single_vote_record(hash: &str, model: &Model) -> Node<Msg> {
+    if let Some((i, vote)) = model.divisions.iter().enumerate().find(|(_, d)| Sha1::default().digest(d.topic.as_bytes()).to_hex() == hash) {
+        div![C!["container"],
+            section![C!["section"],
+                div![C!["content has-text-centered"],
+                    p![C!["title"], &format!("Vote {}", model.divisions.len() - i)],
+                    p![C!["subtitle"], &vote.topic]
+                ]
+            ],
+            section![C!["section"],
+                div![C!["columns"],
+                    div![C!["column"],
+                        p![C!["title"], &format!("Yes ({})", vote.ayes.len())],
+                        vote.ayes.iter().map(|m| member_card(m, "my-6"))
+                    ],
+                    div![C!["column"],
+                        p![C!["title"], &format!("No ({})", vote.nays.len())],
+                        vote.nays.iter().map(|m| member_card(m, "my-6"))
+                    ]
                 ]
             ]
         ]
-    ]
+    } else {
+        super::error::error_404(false)
+    }
+
 }
