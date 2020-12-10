@@ -3,6 +3,12 @@ use seed::{*, prelude::*};
 use super::mpp::member_card;
 use sha::sha1::Sha1;
 use sha::utils::{Digest, DigestExt};
+use regex::Regex;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref BILL_RE: Regex = Regex::new(r"bill (?:pr)?\d+").unwrap();
+}
 
 fn topic_hash(topic: &str) -> String {
     Sha1::default().digest(topic.as_bytes()).to_hex()
@@ -60,9 +66,12 @@ pub fn single_vote_record(hash: &str, model: &Model) -> Node<Msg> {
     if let Some((i, vote)) = model.divisions.iter().enumerate().find(|(_, d)| Sha1::default().digest(d.topic.as_bytes()).to_hex() == hash) {
         div![C!["container"],
             section![C!["section"],
-                div![C!["content has-text-centered"],
+                div![C!["content has-text-centered is-medium"],
                     p![C!["title"], &format!("Vote {}", model.divisions.len() - i)],
-                    p![C!["subtitle"], &vote.topic]
+                    p![C!["subtitle"], &vote.topic],
+                    BILL_RE.captures(&vote.topic.to_lowercase()).map(|bill| {
+                        a![attrs!{ At::Href => format!("https://www.ola.org/en/legislative-business/bills/parliament-42/session-1/{}", bill.get(0).unwrap().as_str().replace(" ", "-"))}, "Text of the bill"]
+                    })
                 ]
             ],
             section![C!["section"],
