@@ -29,7 +29,7 @@ main-subtitle = Ce site web garde des enregistrements de tous les votes enregist
 
 ## Temp bubble on home page
 main-temp-adjourned = La Chambre est suspendu
-main-temp-adjourned-subtitle = Le Parlement de l'Ontario est suspendu jusqu'à le 16 février, 2021.
+main-temp-adjourned-subtitle = Le Parlement de l'Ontario est suspendu jusqu'au 16 février, 2021.
 
 ## MPPs list and specifics
 member-member-for = Member for { $riding }
