@@ -3,7 +3,6 @@ use seed::browser::fetch::{Request, Header};
 use seed::fetch::Method;
 use percent_encoding::{AsciiSet, CONTROLS, utf8_percent_encode};
 use serde::Deserialize;
-use web_sys::RequestMode;
 
 const FRAGMENT: &'static AsciiSet = &CONTROLS.add(b' ');
 

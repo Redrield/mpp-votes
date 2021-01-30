@@ -9,9 +9,9 @@ skip_core_tasks = true
 [tasks.watch]
 description = "Watch files and recompile the project on change"
 run_task = [
-    { name = "build" },
+    { name = ["build", "copy"] },
 ]
-watch = true
+watch = { ignore_pattern = "server/*" }
 
 [tasks.serve]
 description = "Start server"
@@ -30,6 +30,11 @@ description = "Build with wasm-pack"
 install_crate = { crate_name = "wasm-pack", binary = "wasm-pack", test_arg = "-V" }
 command = "wasm-pack"
 args = ["build", "--target", "web", "--out-name", "package", "--dev"]
+
+[tasks.copy]
+description = "Copy built artifacts to the working dir of the webserver"
+command = "cp"
+args = ["-r", "./pkg", "server/dist"]
 
 [tasks.build_release]
 description = "Build with wasm-pack in release mode"

@@ -63,13 +63,13 @@ pub fn navbar(model: &Model) -> Node<Msg> {
         ],
         div![C!["navbar-menu", IF!(navbar_active => "is-active")], id!["mainNavbar"],
             div![C!["navbar-start"],
-                a![C!["navbar-item", IF!(*current_page == Page::Home => "is-active")], attrs!{ At::Href => "#" }, "Home"],
-                a![C!["navbar-item", IF!(*current_page == Page::MppList => "is-active")], attrs!{ At::Href => "#/members" }, "MPPs"],
-                a![C!["navbar-item", IF!(*current_page == Page::VoteList => "is-active")], attrs!{ At::Href => "#/votes" }, "Votes"],
-                a![C!["navbar-item", IF!(*current_page == Page::Faqs => "is-active")], attrs!{ At::Href => "#/faq" }, "FAQs"]
+                a![C!["navbar-item", IF!(*current_page == Page::Home => "is-active")], attrs!{ At::Href => "#" }, fl!("navbar-item-home")],
+                a![C!["navbar-item", IF!(*current_page == Page::MppList => "is-active")], attrs!{ At::Href => "#/members" }, fl!("navbar-item-mpps")],
+                a![C!["navbar-item", IF!(*current_page == Page::VoteList => "is-active")], attrs!{ At::Href => "#/votes" }, fl!("navbar-item-votes")],
+                a![C!["navbar-item", IF!(*current_page == Page::Faqs => "is-active")], attrs!{ At::Href => "#/faq" }, fl!("navbar-item-faq")]
             ],
             div![C!["navbar-end"],
-                p![C!["navbar-item"], &format!("Latest Hansard: {}", latest_hansard)]
+                p![C!["navbar-item"], fl!("navbar-item-hansard", latest_date = latest_hansard)]
             ]
         ]
     ]

@@ -11,8 +11,19 @@ use crate::ui::Page;
 use lazy_static::lazy_static;
 use regex::Regex;
 
+macro_rules! fl {
+    ($message_id:literal) => {{
+        i18n_embed_fl::fl!($crate::i18n::LOADER, $message_id)
+    }};
+
+    ($message_id:literal, $($args:expr),*) => {{
+        i18n_embed_fl::fl!($crate::i18n::LOADER, $message_id, $($args), *)
+    }};
+}
+
 mod api;
 mod ui;
+mod i18n;
 
 lazy_static! {
     static ref POSTAL_CODE_RE: Regex = Regex::new(r#"[a-zA-Z][0-9][a-zA-Z]\s?[0-9][a-zA-Z][0-9]"#).unwrap();
