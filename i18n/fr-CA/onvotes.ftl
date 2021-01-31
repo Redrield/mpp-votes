@@ -5,7 +5,7 @@ error-404-subtitle = Nous ne pouvons pas trouver ce que vous cherchiez.
 ## FAQ page
 faqs-title = Foire aux Questions
 
-faqs-faq-info-title = d'où vient cette information?
+faqs-faq-info-title = D'où vient cette information?
 faqs-faq-info-body = Les votes sont soutirer d'un document nommé Hansard, qui est publié par l'Assemblée Legislative de l'Ontario.
     Hansard document le procès du jour, et inclus des enregistrements de tous les votes dans un jour donné, et comment les députés ont voté.
 
