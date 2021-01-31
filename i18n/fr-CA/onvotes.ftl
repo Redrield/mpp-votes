@@ -16,7 +16,7 @@ faqs-faq-all-votes-body2 = la page du projet
 faqs-faq-all-votes-body3 = pour que je pourrais changer l'algorithme pour capturer le vote en question.
 
 faqs-faq-how-title = Comment ça marche?
-faqs-faq-how-body = Le code qui s'exécute ONVotes est tous disponible sur GitHub. Le dépôt contient des détail à propos du structure du projet, et quels partis du projet fait quoi.
+faqs-faq-how-body = Le code qui s'exécute ONVotes est tout disponible sur GitHub. Le dépôt contient des détails à propos du structure du projet, et quels partis du projet font quoi.
 
 ## Footer
 footer-foreword = ONVotes par Kaitlyn Kenwell
@@ -25,10 +25,10 @@ footer-assembly = l'Assemblée Législative de l'Ontario
 
 ## Home page
 main-subtitle = Ce site web garde des enregistrements de tous les votes enregistré dans la 42e séance de l'Assemblée Législative de l'Ontario d'une manière abordable.
-    Pour retrouver l'histoire de vote d'un député précis, cliquez l'onglet Députés pour les trouver. Pour trouver une vote précise, cliquez l'onglet Votes.
+        Pour retrouver l'histoire de vote d'un député précis, cliquez l'onglet Députés pour les trouver. Pour trouver un vote précise, cliquez l'onglet Votes.
 
 ## Temp bubble on home page
-main-temp-adjourned = La Chambre est suspendu
+main-temp-adjourned = La Chambre est suspendue
 main-temp-adjourned-subtitle = Le Parlement de l'Ontario est suspendu jusqu'au 16 février, 2021.
 
 ## MPPs list and specifics
@@ -37,7 +37,7 @@ member-list-subtitle = Une liste de tous les députés actuel. Cherchez par nom,
 member-search-placeholder = Trouvez votre député
 member-search-button = Cherchez
 member-search-not-found = Nous n'avons rien trouvé correspondant à cette requête
-member-mpp-for = Député de { $riding }
+member-mpp-for = Député(e) de { $riding }
 member-member-of = Membre du { $party }
 member-voting-records = Registres de Vote
 member-vote-record = { $name } a voté
