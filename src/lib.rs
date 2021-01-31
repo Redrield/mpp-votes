@@ -10,6 +10,9 @@ use log::Level;
 use crate::ui::Page;
 use lazy_static::lazy_static;
 use regex::Regex;
+use crate::i18n::LangExt;
+use common::Lang;
+use i18n_embed::LanguageLoader;
 
 macro_rules! fl {
     ($message_id:literal) => {{
@@ -24,6 +27,7 @@ macro_rules! fl {
 mod api;
 mod ui;
 mod i18n;
+mod nav;
 
 lazy_static! {
     static ref POSTAL_CODE_RE: Regex = Regex::new(r#"[a-zA-Z][0-9][a-zA-Z]\s?[0-9][a-zA-Z][0-9]"#).unwrap();
@@ -34,7 +38,7 @@ lazy_static! {
 // ------ ------
 
 // `init` describes what should happen when your app started.
-fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
+fn init(mut url: Url, orders: &mut impl Orders<Msg>) -> Model {
     orders.subscribe(Msg::UrlChanged);
     orders.perform_cmd(async {
         let data = Request::new("/data/members")
@@ -53,6 +57,9 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         Msg::DivisionsFetched(data)
     });
 
+    let (lang, page) = nav::decode_url(url);
+    i18n::LOADER.load_languages(&i18n::Localizations, &[&lang.to_language_identifier()]);
+
     Model {
         members_search: SimSearch::new_with(SearchOptions::new().case_sensitive(false).threshold(0.6)),
         members: vec![],
@@ -60,7 +67,8 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         query: "".to_string(),
         divisions: vec![],
         display_divisions: None,
-        current_page: Page::from(url),
+        current_page: page,
+        lang,
         rdy: false,
         searching: false,
         navbar_active: false,
@@ -85,6 +93,7 @@ pub struct Model {
     searching: bool,
     navbar_active: bool,
     displaying_search_error: bool,
+    lang: Lang,
 }
 
 // ------ ------
@@ -97,6 +106,7 @@ pub enum Msg {
     DivisionsFetched(Vec<Division>),
     UrlChanged(subs::UrlChanged),
     QueryChanged(String),
+    ChangeLang(Lang),
     MemberSearchComplete(Vec<Member>),
     DivisionSearchComplete(Vec<Division>),
     DismissError,
@@ -108,6 +118,11 @@ pub enum Msg {
 fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::NavbarClick => model.navbar_active = !model.navbar_active,
+        Msg::ChangeLang(lang) => {
+            model.lang = lang;
+            i18n::LOADER.load_languages(&i18n::Localizations, &[&model.lang.to_language_identifier()]);
+            Url::go_and_load_with_str(model.current_page.to_link(&model.lang));
+        }
         Msg::Submit => {
             model.searching = true;
             let query = model.query.clone();
@@ -145,7 +160,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         },
         Msg::QueryChanged(query) => model.query = query,
         Msg::UrlChanged(subs::UrlChanged(url)) => {
-            let new_page = Page::from(url);
+            let (new_lang, new_page) = nav::decode_url(url);
             web_sys::window().unwrap().scroll_to_with_x_and_y(0.0, 0.0);
             match (&model.current_page, &new_page) {
                 (&Page::MppList, &Page::Mpp(_)) | (&Page::Mpp(_), &Page::MppList) => {},
@@ -157,12 +172,16 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             }
             model.navbar_active = false;
             model.current_page = new_page;
+            if model.lang != new_lang {
+                i18n::LOADER.load_languages(&i18n::Localizations, &[&new_lang.to_language_identifier()]);
+                model.lang = new_lang;
+            }
         }
         Msg::MembersFetched(members) => {
             model.members = members;
             let m = model.members.clone();
             for member in m {
-                let toks = &[member.full_name.as_str(), member.riding.as_str(), member.party.as_str()];
+                let toks = &[member.full_name.as_str(), member.riding.as_str(), member.party.as_str(&model.lang)];
                 let member = member.clone();
                 model.members_search.insert_tokens(member, toks);
             }

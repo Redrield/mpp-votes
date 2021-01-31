@@ -54,8 +54,8 @@ navbar-item-faq = FAQs
 navbar-item-hansard = Latest Hansard { $latest_date }
 
 ## Bill links and stuff
-bill-link = https://www.ola.org/en/legislative-business/bills/parliament-42/session-1/{ $bill_number }
 vote-title = Vote { $vote_number }
+vote-text-link = Text of the bill
 vote-ayes = Yes ({ $ayes_num })
 vote-nays = No ({ $nays_num })
 vote-list-title = Recorded Votes

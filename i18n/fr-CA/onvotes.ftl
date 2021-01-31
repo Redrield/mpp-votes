@@ -1,22 +1,22 @@
 ## 404 page messages
-error-404-title = Not found
-error-404-subtitle = Whatever you were looking for could not be found.
+error-404-title = Page non trouvée
+error-404-subtitle = Nous ne pouvons pas trouver ce que vous cherchiez.
 
 ## FAQ page
-faqs-title = Frequently Asked Questions
+faqs-title = Foire aux Questions
 
-faqs-faq-info-title = Where does this information come from?
-faqs-faq-info-body = The votes are extracted from a document called Hansard published by the Legislative Assembly of Ontario.
-    Hansard documents the proceedings of a day, and includes records of any votes in a given day, and how members voted.
+faqs-faq-info-title = d'où vient cette information?
+faqs-faq-info-body = Les votes sont soutirer d'un document nommé Hansard, qui est publié par l'Assemblée Legislative de l'Ontario.
+    Hansard document le procès du jour, et inclus des enregistrements de tous les votes dans un jour donné, et comment les députés ont voté.
 
-faqs-faq-all-votes-title = Are all votes recorded here?
-faqs-faq-all-votes-body1 = I do my best to capture every vote that has happened in Parliament and index them here, but there are some times when something slips between the cracks.
-    One example is very long motions documenting changes to standing rules. If there are any votes of consequence that should be documented here, but are missing, submit an issue at
-faqs-faq-all-votes-body2 = the project page
-faqs-faq-all-votes-body3 = so that I can improve the algorithm and capture the vote in question.
+faqs-faq-all-votes-title = Sont tous les votes enregistré ici?
+faqs-faq-all-votes-body1 = J'essais de capturer chaque vote qui arrive dans le Parlement, et de les indexer ici, malgré cela, il y a des moments où quelque chose glisse entre les mailles du filet.
+    Un exemple de cela c'est les motions très longues qui document des changements aux règles permanentes. S'il y a des votes de conséquence qui devront être documenter ici, mais qui ne sont pas, veuillez rapporter le problème à
+faqs-faq-all-votes-body2 = la page du projet
+faqs-faq-all-votes-body3 = pour que je pourrais changer l'algorithme pour capturer le vote en question.
 
-faqs-faq-how-title = How does it work?
-faqs-faq-how-body = The code that runs ONVotes is all available on GitHub. The repository contains details about how it's structured, and what parts of the project do what.
+faqs-faq-how-title = Comment ça marche?
+faqs-faq-how-body = Le code qui s'exécute ONVotes est tous disponible sur GitHub. Le dépôt contient des détail à propos du structure du projet, et quels partis du projet fait quoi.
 
 ## Footer
 footer-foreword = ONVotes par Kaitlyn Kenwell
@@ -25,41 +25,41 @@ footer-assembly = l'Assemblée Législative de l'Ontario
 
 ## Home page
 main-subtitle = Ce site web garde des enregistrements de tous les votes enregistré dans la 42e séance de l'Assemblée Législative de l'Ontario d'une manière abordable.
-    Pour retrouver l'histoire de vote d'un député précis, veuillez cliquer l'onglet Député(e)s pour les trouver. Pour trouver une vote précise, veuillez cliquer l'onglet Votes.
+    Pour retrouver l'histoire de vote d'un député précis, cliquez l'onglet Députés pour les trouver. Pour trouver une vote précise, cliquez l'onglet Votes.
 
 ## Temp bubble on home page
 main-temp-adjourned = La Chambre est suspendu
 main-temp-adjourned-subtitle = Le Parlement de l'Ontario est suspendu jusqu'au 16 février, 2021.
 
 ## MPPs list and specifics
-member-member-for = Member for { $riding }
-member-list-title = Members of Provincial Parliament
-member-list-subtitle = List of all currently sitting MPPs. Search by name, riding, or postal code.
-member-search-placeholder = Find your MPP
-member-search-button = Search
-member-search-not-found = Couldn't find anything matching that query.
-member-mpp-for = MPP for { $riding }
-member-member-of = Member of the { $party }
-member-voting-records = Voting Records
-member-vote-record = { $name } voted
-member-vote-yes = Yes
-member-vote-no = No
-member-vote-neither = No vote recorded.
+member-list-title = Députés du Parlement Provincial
+member-list-subtitle = Une liste de tous les députés actuel. Cherchez par nom, circonscription ou code postal
+member-search-placeholder = Trouvez votre député
+member-search-button = Cherchez
+member-search-not-found = Nous n'avons rien trouvé correspondant à cette requête
+member-mpp-for = Député de { $riding }
+member-member-of = Membre du { $party }
+member-voting-records = Registres de Vote
+member-vote-record = { $name } a voté(e)
+member-vote-yes = Pour
+member-vote-no = Contre
+member-vote-neither = Aucun vote enregistré
 
 ## Navbar items
 navbar-item-home = Acceuil
-navbar-item-mpps = Député(e)s
+navbar-item-mpps = Députés
 navbar-item-votes = Votes
-navbar-item-faq = Questions Fréquentes
+navbar-item-faq = FAQs
 navbar-item-hansard = Hansard Actuel { $latest_date }
 
 ## Bill list and specifcs
-bill-link = https://www.ola.org/en/legislative-business/bills/parliament-42/session-1/{ $bill_number }
 vote-title = Vote { $vote_number }
-vote-ayes = Yes ({ $ayes_num })
-vote-nays = No ({ $nays_num })
-vote-list-title = Recorded Votes
-vote-list-subtitle = A list of all recorded votes in the current session. Click a vote to see the split.
-vote-list-search = Find a specific bill
-vote-list-search-button = Search
-vote-list-not-found = Couldn't find anything matching that query.
+vote-text-link = Texte du projet de loi
+vote-ayes = Pour ({ $ayes_num })
+vote-nays = Contre ({ $nays_num })
+vote-list-title = Votes enrégistrés
+vote-list-subtitle = Une liste de tous les votes enrégistrés dans la séance actuelle. Cliquez un vote pour voir la division.
+
+vote-list-search = Trouvez un projet de loi précis
+vote-list-search-button = Cherchez
+vote-list-not-found = Nous n'avons rien trouvé correspondant à cette requête

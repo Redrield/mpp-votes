@@ -3,6 +3,12 @@ use std::fmt;
 
 pub mod search;
 
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum Lang {
+    En,
+    Fr
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Party {
     OPC,
@@ -40,14 +46,26 @@ impl From<&str> for Party {
 }
 
 impl Party {
-    pub fn as_str(&self) -> &str {
-        match self {
-            Party::OPC => "Progressive Conservative Party",
-            Party::NDP => "New Democratic Party",
-            Party::LIB => "Liberal Party",
-            Party::GRN => "Green Party",
-            Party::Independent => "Independent",
-            Party::Unknown => "Unknown"
+    pub fn as_str(&self, lang: &Lang) -> &str {
+        match lang {
+            Lang::En =>
+                match self {
+                    Party::OPC => "Progressive Conservative Party",
+                    Party::NDP => "New Democratic Party",
+                    Party::LIB => "Liberal Party",
+                    Party::GRN => "Green Party",
+                    Party::Independent => "Independent",
+                    Party::Unknown => "Unknown"
+                }
+            Lang::Fr =>
+                match self {
+                    Party::OPC => "Parti Conservateur Progressiste",
+                    Party::NDP => "Noveau Parti Démocratique",
+                    Party::LIB => "Parti Libéral",
+                    Party::GRN => "Parti Vert",
+                    Party::Independent => "Indépendant",
+                    Party::Unknown => "Inconnue",
+                }
         }
     }
 
