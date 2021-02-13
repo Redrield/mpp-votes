@@ -25,7 +25,7 @@ footer-assembly = l'Assemblée Législative de l'Ontario
 
 ## Home page
 main-subtitle = Ce site web garde des enregistrements de tous les votes enregistré dans la 42e séance de l'Assemblée Législative de l'Ontario d'une manière abordable.
-        Pour retrouver l'histoire de vote d'un député précis, cliquez l'onglet Députés pour les trouver. Pour trouver un vote précise, cliquez l'onglet Votes.
+        Pour retrouver l'histoire de vote d'un député précis, cliquez l'onglet Députés pour les trouver. Pour trouver un vote précis, cliquez l'onglet Votes.
 
 ## Temp bubble on home page
 main-temp-adjourned = La Chambre est suspendue
