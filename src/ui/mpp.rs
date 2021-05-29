@@ -2,6 +2,12 @@ use seed::{*, prelude::*};
 use crate::{Model, Msg};
 use common::{Member, Lang};
 use crate::ui::Page;
+use sha::sha1::Sha1;
+use sha::utils::{Digest, DigestExt};
+
+fn topic_hash(topic: &str) -> String {
+    Sha1::default().digest(topic.as_bytes()).to_hex()
+}
 
 pub fn member_card(lang: &Lang, member: &Member, margin: impl ToClasses) -> Node<Msg> {
     div![C!["card", margin], style!{ St::MinWidth => "14rem", St::MinHeight=> "10rem" },
@@ -71,9 +77,10 @@ pub fn member_voting_record(riding: &str, model: &Model) -> Node<Msg> {
             p![C!["title has-text-centered"], fl!("member-voting-records")],
             div![C!["tile is-ancestor"],
                 div![C!["tile is-parent is-vertical"],
-                    model.divisions.iter().enumerate().map(|(i, d)| {
+                    model.divisions.iter().map(|d| {
+                        let digest = topic_hash(&d.topic);
                         div![C!["tile is-child box"],
-                            a![attrs!{ At::Href => &format!("#/votes/{}", i) }, style!{ St::Color => "inherit", St::TextDecoration => "inherit" },
+                            a![attrs!{ At::Href => &format!("#/votes/{}", digest) }, style!{ St::Color => "inherit", St::TextDecoration => "inherit" },
                                 p![&d.topic],
                                 p![&d.date],
                                 br![],
