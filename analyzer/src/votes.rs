@@ -27,7 +27,7 @@ pub struct RawDivision {
 /// 4. Keep going to get the NAY votes, check to make sure that there isn't a split table (As can occasionally happen on near unanimous motions for AYE)
 /// and once there's no sign of continued voting records for the motion in question, parse the data out of the collected DOM nodes.
 pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
-    let page = reqwest::blocking::get(&format!("https://www.ola.org/en/legislative-business/house-documents/parliament-42/session-1/{}/votes-proceedings", date))?.text()?;
+    let page = reqwest::blocking::get(&format!("https://www.ola.org/en/legislative-business/house-documents/parliament-42/session-2/{}/votes-proceedings", date))?.text()?;
     let page = Document::from(page.as_str());
 
     // Not the best but there isn't a way to go through siblings until the start is found
