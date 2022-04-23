@@ -70,7 +70,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                             log::error!("{:#?}", seen);
                             panic!()
                         });
-                   division.push(movement.clone());
+                    division.push(movement.clone());
                     // Everything between now and then (i.e. the AYE votes)
                     division.extend(
                         seen.iter()
@@ -80,8 +80,7 @@ pub fn extract_votes(date: &str) -> anyhow::Result<Vec<RawDivision>> {
                                 !(n.text().to_lowercase().contains("motion")
                                     || n.text().to_lowercase().contains("moved")
                                     || n.text().to_lowercase().contains("reading")
-                                    || n.text().to_lowercase().contains("bill")
-                                )
+                                    || n.text().to_lowercase().contains("bill"))
                             })
                             .collect::<Vec<Node>>()
                             .into_iter()

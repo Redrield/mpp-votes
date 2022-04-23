@@ -33,7 +33,10 @@ pub fn parse_division(division: &Vec<Node>, date: &str) -> RawDivision {
                     state = ParserState::CollectingAyes;
                     continue;
                 }
-                if !lower.contains("debate") && (!lower.contains("the following division") || (lower.contains("the following division") && topic.is_empty())) {
+                if !lower.contains("debate")
+                    && (!lower.contains("the following division")
+                        || (lower.contains("the following division") && topic.is_empty()))
+                {
                     topic.push_str(&node.text());
                 } else {
                     // Just in case it overflows

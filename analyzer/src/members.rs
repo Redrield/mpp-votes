@@ -1,8 +1,8 @@
 use crate::sites;
+use common::{Member, Party};
 use select::document::Document;
 use select::predicate::{Class, Name};
 use std::iter::Iterator;
-use common::{Member, Party};
 
 /// Members page displays name as <last>, [Hon.] <first>, turn that into <first> <last> for display by the website.
 fn reassemble_name(name: &str) -> String {
